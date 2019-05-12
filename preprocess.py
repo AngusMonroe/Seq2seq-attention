@@ -102,7 +102,3 @@ def prepareData(lang1, lang2, reverse=False):
     print(input_lang.name, input_lang.n_words)
     print(output_lang.name, output_lang.n_words)
     return input_lang, output_lang, pairs
-
-
-input_lang, output_lang, pairs = prepareData('eng', 'fra', True)
-print(random.choice(pairs))

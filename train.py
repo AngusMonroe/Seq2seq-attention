@@ -136,7 +136,10 @@ def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, lear
             plot_loss_total = 0
 
     showPlot(plot_losses)
-    
+
+input_lang, output_lang, pairs = prepareData('eng', 'fra', True)
+print(random.choice(pairs))    
+
 hidden_size = 256
 encoder1 = EncoderRNN(input_lang.n_words, hidden_size).to(device)
 attn_decoder1 = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=0.1).to(device)
