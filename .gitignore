@@ -230,5 +230,8 @@ dmypy.json
 *.bak
 *.pkl
 *.json
+*.model
+loss.png
 data
 >>>>>>> bddb834835f552b864585ebe91f0dde3ee7341ef
+

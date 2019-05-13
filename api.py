@@ -1,11 +1,25 @@
+from preprocess import *
+import io
 import torch
-import random
+import torch.nn as nn
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MAX_LENGTH = 10
+
+def indexesFromSentence(lang, sentence):
+    return [lang.word2index[word] for word in sentence.split(' ')]
+
+def tensorFromSentence(lang, sentence):
+    indexes = indexesFromSentence(lang, sentence)
+    indexes.append(EOS_token)
+    print(indexes)
+    return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
 def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
     with torch.no_grad():
         input_tensor = tensorFromSentence(input_lang, sentence)
+        print(input_tensor)
         input_length = input_tensor.size()[0]
         encoder_hidden = encoder.initHidden()
 
@@ -38,12 +52,28 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
 
         return decoded_words, decoder_attentions[:di + 1]
     
-def evaluateRandomly(encoder, decoder, n=10):
-    for i in range(n):
-        pair = random.choice(pairs)
-        print('>', pair[0])
-        print('=', pair[1])
-        output_words, attentions = evaluate(encoder, decoder, pair[0])
-        output_sentence = ' '.join(output_words)
-        print('<', output_sentence)
-        print('')
+def request(input_sentence):
+    print('>', input_sentence)
+    output_words, attentions = evaluate(encoder, decoder, input_sentence)
+    output_sentence = ' '.join(output_words)
+    print('<', output_sentence)
+    print('')
+    
+def load_vectors(fname):
+    fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
+    n, d = map(int, fin.readline().split())
+    data = {}
+    for line in fin:
+        tokens = line.rstrip().split(' ')
+        data[tokens[0]] = map(float, tokens[1:])
+    return data
+
+if __name__ == '__main__':
+    encoder = torch.load("encoder.model")
+    decoder = torch.load("decoder.model")
+    input_lang, output_lang, pairs = prepareData('eng', 'fra', True)
+
+    request('tu es parfait pour moi .')
+    request('je compte m acheter une nouvelle voiture .')
+#     data = load_vectors('data/cc.en.300.vec')
+#     print(data['is'])
